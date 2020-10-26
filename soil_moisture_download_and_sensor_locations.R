@@ -89,7 +89,7 @@ d2 <- neon_read(table = "sensor_positions")
 sm30 <- neon_table(table = "SWS_30_minute")
 sensor_positions <- neon_table(table = "sensor_positions")
 
-Clean up sensor positions
+#Clean up sensor positions
 #
 sensor_positions <- sensor_positions %>% 
   mutate(horizontalPosition = str_sub(sensor_positions$HOR.VER, 1, 3),
