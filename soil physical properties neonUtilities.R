@@ -12,22 +12,27 @@ phys <-
     site = c("BART","KONZ","OSBS","SRER"),
     dpID = "DP1.10047.001",
     package = "basic",
-    check.size = FALSE
-  )
+    check.size = TRUE )
 
 names(phys)  # here you see the various 'slots' of the object for dp 10047.
 
+
 # make a soil texture object 'txtr'
 pre.txr<-phys$spc_particlesize
+pre.txr
 #  choose columns you want
+names(pre.txr)
 txr<-pre.txr[,c(4,5,8,9,20,21,22)]
 txr<-na.omit(txr)
 head(txr)
+pre.txr$horizonID
+
+table(txr$plotID, txr$siteID)
 
 ## make a two by two panel graph!
 par(mfrow=c(2,2))
 soil.texture(txr[txr$siteID=="BART",5:7], main="BART", show.grid=FALSE, show.lines=T, show.names = F)
-soil.texture(txr[txr$siteID=="OSBS",5:7], main="OSBS", show.grid=FALSE, show.lines=T, show.names = F)
+soil.texture(txr[txr$siteID=="SRER",5:7], main="SRER", show.grid=FALSE, show.lines=T, show.names = F)
 soil.texture(txr[txr$siteID=="KONZ",5:7], main="KONZ", show.grid=FALSE, show.lines=T, show.names = F)
 soil.texture(txr[txr$siteID=="OSBS",5:7], main="OSBS", show.grid=FALSE, show.lines=T, show.names = F)
 
@@ -52,6 +57,12 @@ new <-
 
 
 names(new)  # see how the slots differ?
+
+new$categoricalCodes_10086
+phys$categoricalCodes_10047
+
+
+
 names(phys)
 new$readme_10086
 

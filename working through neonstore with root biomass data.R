@@ -23,11 +23,15 @@ table(ind$product, ind$site)
 table(ind$table)
 
 # specify a table name to read
-neon_read(table="bbc_rootmass-basic")
+rb<-neon_read(table="bbc_rootmass-basic")
+table(rb$siteID, rb$collectDate)
+
+#############
+neon_download("DP1.10047.001")
+neon_store("DP1.10047.001") # import into a local database
 
 
-
-
+#####################################
 ## Soil moisture
 
 #Load data
