@@ -26,10 +26,27 @@ table(ind$table)
 rb<-neon_read(table="bbc_rootmass-basic")
 table(rb$siteID, rb$collectDate)
 
-#############
+
+library(neonstore)
+library(dplyr)
+neon_products() %>% filter(grepl("[Ss]oil", productName))
+
+
 neon_download("DP1.10047.001")
 neon_store("DP1.10047.001") # import into a local database
 
+
+
+#############
+neon_download("DP1.10047.001")
+# See what you have downloaded
+ind<-as.data.frame(neon_index())
+head(ind)
+# view what table names you have?
+table(ind$table)
+
+# read in data?
+bgc<-neon_read("spc_biogeochem-basic") # import into a local database
 
 #####################################
 ## Soil moisture

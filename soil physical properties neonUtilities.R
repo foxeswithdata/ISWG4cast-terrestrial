@@ -7,8 +7,7 @@ library(neonUtilities)
 ###   information on the plotrix soil texture triangles: https://rdrr.io/cran/plotrix/man/soil.texture.html
 
 ### soil physical chx
-phys <-
-  loadByProduct(
+phys <-loadByProduct(
     site = c("BART","KONZ","OSBS","SRER"),
     dpID = "DP1.10047.001",
     package = "basic",
@@ -16,6 +15,8 @@ phys <-
 
 names(phys)  # here you see the various 'slots' of the object for dp 10047.
 
+bgc<-phys$spc_biogeochem
+head(bgc)
 
 # make a soil texture object 'txtr'
 pre.txr<-phys$spc_particlesize
