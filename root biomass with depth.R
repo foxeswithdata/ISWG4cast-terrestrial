@@ -7,7 +7,7 @@
 #remotes::install_github("cboettig/neonstore")
 library(neonstore)
 
-
+library(neonUtilities)
 
 
 
@@ -16,9 +16,7 @@ neonstore::neon_download(product = "DP1.10066.001", site = c("OSBS","KONZ","BART
 
 ## Soil moisture
 ind<-as.data.frame(neon_index())
-
 table(ind$table)
-table(ind$product, ind$site)
 
 
 #Load data
@@ -26,14 +24,15 @@ neon_store(table = "bbc_rootmass-basic")
 
 
 rbio <-as.data.frame( neon_read(table = "bbc_rootmass-basic") )
+head(rbio)
+table(rbio$siteID)
 rbio<-rbio[rbio$siteID==c("BART","KONZ","SRER","OSBS"),]
 
 
-roots <-loadByProduct(
-  site = c("BART","KONZ","OSBS","SRER"),
-  dpID = "DP1.10066.001",
-  package = "basic",
-  check.size = F )
+
+roots <-loadByProduct(site = c("BART","KONZ","OSBS","SRER"),
+  dpID = "DP1.10066.001",  check.size = F )
+
 names(roots)
 roots$variables_10066
 
@@ -90,6 +89,10 @@ locMean <-
 
 
 head(locMean,120)
+
+
+
+
 
 ##
 byTileAOP("DP3.30010.001", site=c("SRER","KONZ","SRER",'BART'), year="2019", 

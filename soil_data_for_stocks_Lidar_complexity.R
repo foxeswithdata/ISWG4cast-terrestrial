@@ -2,7 +2,7 @@ library(broom)
 library(ggplot2)
 library(neonUtilities)
 library(devtools)
-install_github('NEONScience/NEON-geolocation/geoNEON', dependencies=TRUE)
+#install_github('NEONScience/NEON-geolocation/geoNEON', dependencies=TRUE)
 library(geoNEON)
 library(lidR)
 library(gstat)
@@ -12,32 +12,17 @@ library(sp)
 library(rgdal)
 library(raster)
 
-
-##  load soil data products
-# spc is soil chemistry
-spc <-
-  loadByProduct(
-    site = "BART",
-    dpID = "DP1.10008.001",
-    package = "basic",
-    check.size = FALSE
-  )
-
-# these objects have 'slots'. Access a slot with the $, then also use $ to refer to columns
-names(spc)
-spc$spc_biogeochem
-
-# soil physical characteristics
+# soil characteristics
 phys <-
   loadByProduct(
-    site = "BART",
+    site = c("BART","SRER","OSBS","KONZ"),
     dpID = "DP1.10047.001",
     package = "basic",
     check.size = FALSE
   )
-
+names(phys)
 # this is the data page of the spc object
-data <- spc$spc_biogeochem
+data <- phys$spc_biogeochem
 
 # make separate objects for each df.
 bd <- phys$spc_bulkdensity
@@ -65,30 +50,11 @@ use$bulkDensThirdBar <-
 use$horizonThickness <-
   ph$horizonHeight[match(use$horizonID, ph$horizonID)]
 
-# calculate the carbon stock
-use$carbonTot_stock <-
-  use$carbonTot * use$bulkDensFieldMoist * use$horizonThickness / 1000
-plot(use$carbonTot_stock) # is this range of values expected?
-
-# calculate N stock
-use$nitrogenTot_stock <-
-  use$nitrogenTot * use$bulkDensFieldMoist * use$horizonThickness / 1000
-plot(use$nitrogenTot_stock) # is this range of values expected?
-
-#this is kinda cool- C:N ratio - would be really freaking cool to plot every soil horizon C:N for the 20 domains
-plot(use$nitrogenTot_stock, use$carbonTot_stock)
-
-
-#! Issue!   when you look at which horizons are included in the stock calculation, a lot are NA for the Oa.
-# Organic horizon has a ton of carbon!  But its not very thicc... 
-# the reason there are NAs are because a different method was used-  bulkDensThirdBar vs bulkDensFieldMoist
-## to solve this, we need an 'if else' statement to use whichever value is available?  help requested!
-
-table(use$horizonName , is.na(use$carbonTot_stock))  # the Oa horizon has a lot of missing samples?
 
 # start by creating the column you want to add data to, then go by row and calculate the values. Here, I've created a function to test if the default calculation leads to Na's
 # dummy column
 use$carbonTot_stock = NA
+use$nitrogenTot_stock = NA
 # options for calculations
 option1 = function(row, column){
   use[row,column] * use$bulkDensFieldMoist[row] * use$horizonThickness[row] / 1000
@@ -104,9 +70,11 @@ for(i in c(1:nrow(use))){
     if(is.na(option1(i, a)) == FALSE){
       # if the horizon is Oa, do this calculation
       use$carbonTot_stock[i] = option1(i, a)
+      use$nitrogenTot_stock[i] = option1(i, a) #AY added this
     } else {
       # otherwise, do this calculation
       use$carbonTot_stock[i] = option2(i, a)
+      use$nitrogenTot_stock[i] = option2(i, a) #AY added this
     }
   }
 }
@@ -116,16 +84,19 @@ for(i in c(1:nrow(use))){
 stock <-
   aggregate(
     list(
-      Nstock = use$carbonTot_stock,
+      Nstock = use$nitrogenTot_stock,
       Cstock = use$carbonTot_stock
     ),
-    by = list(plotID = use$plotID),
+    by = list(plotID = use$plotID, siteID=use$siteID),
     FUN = "sum",
     na.rm = T
   )
 
+ggplot(use, aes(x=siteID, y=nitrogenTot_stock, col=siteID))+geom_point()
+
+use[use$siteID=="SRER",]
 # good ol' C:N ratio
-ggplot(stock, aes(x = Cstock, y = Nstock)) + geom_point()
+ggplot(stock, aes(x = Cstock, y = Nstock, col=siteID)) + geom_point()
 
 ## now access plotID locations-
 # begin by loading veg plot
