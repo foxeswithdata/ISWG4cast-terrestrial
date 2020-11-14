@@ -1,42 +1,47 @@
 
 
 
-## NEON rooting depth
-
-############ Below uses Neon_store
-#remotes::install_github("cboettig/neonstore")
-library(neonstore)
 
 library(neonUtilities)
 
-
-
-# download root biomass 10066.001
-neonstore::neon_download(product = "DP1.10066.001", site = c("OSBS","KONZ","BART","SRER"), type = "basic")
-
-## Soil moisture
-ind<-as.data.frame(neon_index())
-table(ind$table)
-
-
-#Load data
-neon_store(table = "bbc_rootmass-basic") 
-
-
-rbio <-as.data.frame( neon_read(table = "bbc_rootmass-basic") )
-head(rbio)
-table(rbio$siteID)
-rbio<-rbio[rbio$siteID==c("BART","KONZ","SRER","OSBS"),]
-
-
-
+### this worked well.  
 roots <-loadByProduct(site = c("BART","KONZ","OSBS","SRER"),
   dpID = "DP1.10066.001",  check.size = F )
 
-names(roots)
-roots$variables_10066
 
-head(roots$mpr_perrootsample)
+names(roots)
+
+names(roots$bbc_rootmass)
+
+names(roots$categoricalCodes_10066)
+names(roots$mpr_carbonNitrogen)
+names(roots$mpr_perdepthincrement )
+names(roots$mpr_perpitprofile)
+names(roots$mpr_perrootsample)
+
+head(ro)
+ro<-roots$mpr_perrootsample
+ro$siteID<-substr(ro$sampleID, 1, 4)
+
+# I like the one below more.
+ggplot(ro, aes(x=sizeCategory,y=rootDryMass, col=rootStatus))+geom_point()+
+  facet_wrap(~siteID,scales="free_x")+ggtitle("Root Biomass")+  theme(axis.text.x = element_text(angle = 90))
+
+
+
+rbio<-roots$mpr_perpitprofile
+head(rbio)
+
+library(ggplot2)
+
+g.2<-ggplot(rbio, aes(x=totalRootBiomass, y=-maxProfileDepth, shape=sizeCategory ,col=rootStatus))+geom_point()+
+  facet_wrap(~siteID, nrow=1)+ggtitle("Root Biomass")
+
+
+
+library(ggpubr)
+ggarrange(g.1, g.2, g.3, g.4)
+
 
 #####################################################
 
@@ -55,18 +60,18 @@ location<-tree$vst_mappingandtagging
 
 
 chx$species<-location$taxonID[match(chx$individualID, location$individualID)]
-
+head(chx)
 
 plots<-aggregate(chx$stemDiameter, by=list(siteID=chx$siteID, plotID=chx$plotID), FUN="sum", na.rm=T)
 
-ggplot(plots, aes(x=siteID, y=x))+geom_boxplot()+scale_y_log10()
+g.1<-ggplot(chx, aes(x=plotID, y=stemDiameter, col=siteID))+geom_boxplot()+scale_y_log10()+facet_wrap(~siteID, scales="free_x", nrow=1)+
+  theme(axis.text.x = element_text(angle = 90))+ggtitle("Tree diameters")
+g.1
 
 
 
 
-
-
-
+########### don't go below yet.
 
 # you can get locations of veg plots conveniently using getLocTOS
 m <- getLocTOS(data = tree$vst_mappingandtagging,
