@@ -77,11 +77,7 @@ noaa_gefs_read <- function(base_dir, date, cycle, sites){
 }
 
 
-#(base_dir, date, cycle, sites)
-#' @param base_dir directory of the particular NOAA GEFS model (i.e., NOAAGEFS_1hr)
-#' @param date date in YYYY-MM-DD of the forecast
-#' @param cycle cycle of the forecast; the options are 00, 06, 12, 18
-#' @param sites list if siteID
+# run function
 
 base_dir <- "./efi_neon_challenge/drivers/noaa/NOAAGEFS_1hr"
 
