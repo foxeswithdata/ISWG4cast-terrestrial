@@ -21,7 +21,13 @@
 
 library(tidyverse)
 library(ncdf4)
+library(rgdal)
+library(gdalUtils)
 
+# trying to get data from web database
+download.file("file:///C:/Users/90946112/AppData/Local/Temp/NOAAGEFS_1hr_BART_2020-10-21T00_2020-11-25T00_ens29.nc", destfile = "efi_neon_challenge/NOAAGEFS_1hr_BART_2020-10-21T00_2020-11-25T00_ens29.nc")
+
+# reading data function ####
 noaa_gefs_read <- function(base_dir, date, cycle, sites){
   
   if(!(cycle %in% c("00","06","12","18"))){
