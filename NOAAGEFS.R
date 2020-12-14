@@ -23,9 +23,8 @@ library(tidyverse)
 library(ncdf4)
 library(rgdal)
 library(gdalUtils)
-
-# trying to get data from web database
-download.file("file:///C:/Users/90946112/AppData/Local/Temp/NOAAGEFS_1hr_BART_2020-10-21T00_2020-11-25T00_ens29.nc", destfile = "efi_neon_challenge/NOAAGEFS_1hr_BART_2020-10-21T00_2020-11-25T00_ens29.nc")
+library(tidync)
+library(stars)
 
 # reading data function ####
 noaa_gefs_read <- function(base_dir, date, cycle, sites){
@@ -34,12 +33,7 @@ noaa_gefs_read <- function(base_dir, date, cycle, sites){
     stop("cycle not available cycles of 00, 06,12,18")
   }
   
-  cf_met_vars <- c("air_temperature",
-                   "surface_downwelling_shortwave_flux_in_air",
-                   "surface_downwelling_longwave_flux_in_air",
-                   "relative_humidity",
-                   "wind_speed",
-                   "precipitation_flux")
+  cf_met_vars <- c("air_temperature")
   
   combined_met <- NULL
   
@@ -87,10 +81,49 @@ noaa_gefs_read <- function(base_dir, date, cycle, sites){
 
 base_dir <- "./efi_neon_challenge/drivers/noaa/NOAAGEFS_1hr"
 
-date <- "2020-10-21"
+date <- "2020-09-25"
 
 cycle <- "00"
 
 sites <- "BART"
 
-noaa_gefs_read(base_dir, date, cycle, sites)
+bart = noaa_gefs_read(base_dir, date, cycle, sites)
+
+# extract dates from BART main folder
+date_dir <- file.path(base_dir, sites)
+date_folders <- list.files(date_dir, full.names = FALSE)
+
+# loop through dates and extract files
+times = seq(as.POSIXct("2020-09-25"), as.POSIXct("2021-01-17"), by = difftime("2020-09-25 01:00:00", "2020-09-25 00:00:00", units = "hours"))
+new = data.frame(datetime = times)
+new$availability = 0
+
+for(i in 1:length(date_folders)){
+  x = noaa_gefs_read(base_dir, date_folders[i], cycle, sites)
+  new2 = x %>% 
+    group_by(time) %>% 
+    tally() 
+  new$availability[new$datetime %in% new2$time] = new$availability + new2$time
+}
+# stops working, I think on 2020-10-21. Removing this date doesn't help
+
+# let's try the tidync package
+forecast_dir <- file.path(base_dir, sites, lubridate::as_date(date_folders[1]),cycle)
+
+forecast_files <- list.files(forecast_dir, full.names = TRUE)
+
+nfiles <-   length(forecast_files)
+
+file = system.file(forecast_files[1])
+
+tidync(forecast_files[1])
+# this works
+
+read_ncdf(forecast_files[6])
+# this works
+
+## what is next?
+# we want just the NOAA predictions at the beginning of each month
+# 1) grab just the predictions from the first day of the month, 00 cycle
+# 2) throw out the first ensemble
+# 3) calculate the mean and standard error of all ensembles
