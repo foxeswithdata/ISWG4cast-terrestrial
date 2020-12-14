@@ -1,9 +1,8 @@
 
 ## Intro to using neonstore by Carl Boetigger: https://github.com/cboettig/neonstore
 
-#remotes::install_github("cboettig/neonstore")
+remotes::install_github("cboettig/neonstore")
 library(neonstore)
-
 ###  This is a way to access all the products.
 products <- neon_products()
 
