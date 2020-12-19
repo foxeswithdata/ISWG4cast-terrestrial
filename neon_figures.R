@@ -5,6 +5,48 @@ library(tidyverse)
 library(lubridate)
 library(contentid)
 
+library(ggplot2)
+library(data.table)
+
+fd<-fread("terrestrial_30min-targets.csv.gz")
+fd$Year<-year(fd$time)
+fd$Month<-month(fd$time)
+fd$mday<-mday(fd$time)
+fd$hour<-hour(fd$time)
+
+table(fd$mday)
+
+head(fd)
+fd$group<-paste(fd$Year, fd$siteID)
+
+ggplot(fd, aes(x=mday, y=nee,group=group, col=siteID, alpha=Year))+
+  geom_point()+geom_line()+facet_grid(Month~Year)+ggtitle("30 min NEE at NEON sites")
+
+fd$group<-paste(fd$Year, fd$siteID, fd$mday, fd$Month)
+
+ggplot(fd, aes(x=hour, y=nee,group=group, col=siteID, alpha=Year))+
+  geom_point()+geom_line()+facet_grid(Month~Year)+ggtitle("30 min NEE at NEON sites")
+
+
+
+fdaily<-fread("terrestrial_daily-targets.csv.gz")
+fd$Year<-year(fd$time)
+fd$Month<-month(fd$time)
+fd$mday<-mday(fd$time)
+
+table(fd$mday)
+
+head(fd)
+fd$group<-paste(fd$Year, fd$siteID)
+
+ggplot(fd, aes(x=mday, y=nee,group=group, col=siteID, alpha=Year))+
+  geom_point()+geom_line()+facet_grid(Month~Year)+ggtitle("Daily NEE at NEON sites")
+
+
+
+
+
+
 # Terrestrial
 #DP4.00200.001 & DP1.00094.001
 neon_download("DP4.00200.001")

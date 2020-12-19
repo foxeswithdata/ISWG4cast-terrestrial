@@ -1,7 +1,14 @@
 
 ## Intro to using neonstore by Carl Boetigger: https://github.com/cboettig/neonstore
 
+
+
+
 remotes::install_github("cboettig/neonstore")
+
+
+
+library(duckdb)
 library(neonstore)
 ###  This is a way to access all the products.
 products <- neon_products()
@@ -10,6 +17,8 @@ i <- grepl("Populations", products$themes)
 prod<-as.data.frame(products[i, c("productCode", "productName")])
 
 print(prod)  # I don't see a soil physical properties - from neonUtilities it is dpID: "DP1.10047.001"
+
+
 
 # this is to download the root biomass, chemistry, periodic
 neon_download("DP1.10067.001")
