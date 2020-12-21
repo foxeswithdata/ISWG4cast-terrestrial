@@ -107,6 +107,10 @@ fd$par<-par$par[match(fd$group, temp$group)]
 fd$resp<-resp$resp[match(fd$group, temp$group)]
 
 ggplot(fd, aes(x=temp, y=nee))+geom_point(shape=".")+facet_wrap(~siteID)  
+str(f)
+f<-as.data.frame(fd)
 
 
-write.csv(fd, file="inputs.csv")
+
+table(fd$siteID)
+write.csv(f, file="input2.csv")
