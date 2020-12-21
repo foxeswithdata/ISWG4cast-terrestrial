@@ -32,8 +32,7 @@ names(par_data)
 
 table(par_data$horizontalPosition)
 ## data processing steps
-par_data$time<-as_datetime(par$startDateTime)
-
+par_data$time<- as_datetime(par_data$startDateTime)
 
 par<-par_data[,c("time","siteID","PARFinalQF", "PARMean", "verticalPosition")]
 head(par)
@@ -42,14 +41,16 @@ s40<-par[par$siteID==c("KONZ","SRER"),]
 s40<-s40[s40$verticalPosition=="040",]
 s60<-par[par$siteID==c("BART","OSBS"),]
 s60<-s60[s60$verticalPosition=="060",]
+
 par<-rbind(s40, s60)
 table(par$verticalPosition, par$PARFinalQF)
 
-table(par$time, par$siteID)
+
 ggplot(par, aes(x=time, y=PARMean,col=as.factor(PARFinalQF)))+geom_point(shape=".")+facet_wrap(~siteID)
+par<-par[par$PARFinalQF==0,]
 #3 why are there so many lines?
-par<-aggregate(list(par=par$PARMean), by=list(time=par$time,siteID=par$siteID), FUN="mean")
-ggplot(par, aes(x=time, y=par))+geom_point(shape=".")+facet_wrap(~siteID)
+par2<-aggregate(list(par=par$PARMean), by=list(time=par$time,siteID=par$siteID), FUN="mean")
+ggplot(par2, aes(x=time, y=par))+geom_point(shape=".")+facet_wrap(~siteID)
 #################
 
 # This downloads the respiration
@@ -97,20 +98,23 @@ head(fd)
 fd$group<-paste(fd$time, fd$siteID)
 temp$group<-paste(temp$time, temp$siteID)
 preci$group<-paste(preci$time, preci$siteID)
-par$group<-paste(par$time, par$siteID)
+par2$group<-paste(par2$time, par2$siteID)
 resp$group<-paste(resp$time, resp$siteID)
 
 
 fd$temp<-temp$temp[match(fd$group, temp$group)]
-fd$preci<-preci$preci[match(fd$group, temp$group)]
-fd$par<-par$par[match(fd$group, temp$group)]
-fd$resp<-resp$resp[match(fd$group, temp$group)]
-
-ggplot(fd, aes(x=temp, y=nee))+geom_point(shape=".")+facet_wrap(~siteID)  
-str(f)
-f<-as.data.frame(fd)
+fd$preci<-preci$preci[match(fd$group, preci$group)]
+fd$par<-par2$par[match(fd$group, par2$group)]
+fd$resp<-resp$resp[match(fd$group, resp$group)]
 
 
+f<-gather(fd, "variable","value",c(3,4,11,14,15,16,17))
+names(fd)
+
+
+g<-fd[,c(1,2,3,4,11,14:17)]
+
+head(g)
 
 table(fd$siteID)
-write.csv(f, file="input2.csv")
+write.csv(g, file="input3.csv")
