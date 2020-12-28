@@ -93,20 +93,6 @@ bart = noaa_gefs_read(base_dir, date, cycle, sites)
 date_dir <- file.path(base_dir, sites)
 date_folders <- list.files(date_dir, full.names = FALSE)
 
-# loop through dates and extract files
-times = seq(as.POSIXct("2020-09-25"), as.POSIXct("2021-01-17"), by = difftime("2020-09-25 01:00:00", "2020-09-25 00:00:00", units = "hours"))
-new = data.frame(datetime = times)
-new$availability = 0
-
-for(i in 1:length(date_folders)){
-  x = noaa_gefs_read(base_dir, date_folders[i], cycle, sites)
-  new2 = x %>% 
-    group_by(time) %>% 
-    tally() 
-  new$availability[new$datetime %in% new2$time] = new$availability + new2$time
-}
-# stops working, I think on 2020-10-21. Removing this date doesn't help
-
 # let's try the tidync package
 forecast_dir <- file.path(base_dir, sites, lubridate::as_date(date_folders[1]),cycle)
 
@@ -116,7 +102,7 @@ nfiles <-   length(forecast_files)
 
 file = system.file(forecast_files[1])
 
-tidync(forecast_files[1])
+tidync(forecast_files[6])
 # this works
 
 read_ncdf(forecast_files[6])
@@ -127,3 +113,9 @@ read_ncdf(forecast_files[6])
 # 1) grab just the predictions from the first day of the month, 00 cycle
 # 2) throw out the first ensemble
 # 3) calculate the mean and standard error of all ensembles
+# 4) put data in tidy format, with all sites included- long form
+
+# 5) grab 3 ensembles from this dataset for 2020-12-01 and clean code for how to call it
+# 6) calculate mean and stdev between the ensembles
+# 7) plot the mean and stdev for 35 days
+# 8) push script and 3 ensemble files within standard folder structure to the main repo
