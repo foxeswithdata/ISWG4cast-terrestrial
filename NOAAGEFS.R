@@ -80,26 +80,59 @@ noaa_gefs_read <- function(base_dir, date, cycle, sites){
 }
 
 
-# run function
-
+# bart ####
+# define settings
 base_dir <- "./efi_neon_challenge/drivers/noaa/NOAAGEFS_1hr"
-
-date <- c("2020-10-01", "2020-11-01", "2020-12-01")
-
+date <- c("2020-10-01", "2020-11-01", "2020-12-01", "2021-01-01")
 cycle <- "00"
-
 sites <- "BART"
 
-bart = noaa_gefs_read(base_dir, date, cycle, sites)
+# compile files and remove the "00" ensemble, which does not predict the entire month
+df = noaa_gefs_read(base_dir, date, cycle, sites) %>% 
+  dplyr::filter(ensemble != "0")
 
-## what is next?
-# we want just the NOAA predictions at the beginning of each month
-# 1) grab just the predictions from the first day of the month, 00 cycle
-# 2) throw out the first ensemble
-# 3) calculate the mean and standard error of all ensembles
-# 4) put data in tidy format, with all sites included- long form
+# generate statistics
+df_stats = aggregate(data = df, air_temperature ~ siteID + time + preddate, FUN = function(x) c(avg = mean(x)/10,upper = (mean(x) + sd(x)/sqrt(length(x)))/10, lower = (mean(x) - sd(x)/sqrt(length(x)))/10), simplify = TRUE, drop = TRUE)
 
-# 5) grab 3 ensembles from this dataset for 2020-12-01 and clean code for how to call it
-# 6) calculate mean and stdev between the ensembles
-# 7) plot the mean and stdev for 35 days
-# 8) push script and 3 ensemble files within standard folder structure to the main repo
+# reformat for convenience
+val<-data.frame(df_stats[["air_temperature"]])
+df_stats$airT_mean<-val$avg
+df_stats$airT_upperconf<-val$upper
+df_stats$airT_lowerconf<-val$lower
+
+# remove original variables
+df_stats = df_stats %>% 
+  dplyr::select(-siteID,
+                -air_temperature)
+
+# remove extraneous objects
+rm(df, val)
+
+# split data frame into list object to plot predictions based on start date
+df_stats$preddate = as.factor(df_stats$preddate)
+split_df<-split(df_stats, droplevels(df_stats$preddate))
+
+# generate standard axes for plotting
+ymin = min(df_stats$airT_lowerconf)
+ymax = max(df_stats$airT_upperconf)
+xmin = min(df_stats$time)
+xmax = max(df_stats$time)
+
+# plot
+tiff(file = paste(sites[1], "airtemp.tif", sep = ""), width =1600, height = 1200, units = "px", res = 200)
+colours = rainbow(length(split_df))
+with(split_df[[1]], plot(airT_mean ~ time, 
+                     type = "l",
+                     bty ='l',
+                     ylim = c(ymin, ymax),
+                     xlim = c(xmin, xmax),
+                     ylab = expression(paste("Air Temperature (",degree~C,")")),
+                     xlab = "Date",
+                     col = colours[1]))
+with(split_df[[1]], polygon(c(time, rev(time)), c(airT_lowerconf, rev(airT_upperconf)), col =  "gray70", border = NA))
+with(split_df[[1]], points(airT_mean ~ time, type = "l", col = colours[1], lwd = 0.75))
+for(i in (c(2:length(split_df)))){
+  with(split_df[[i]], polygon(c(time, rev(time)), c(airT_lowerconf, rev(airT_upperconf)), col = "gray70", border = NA))
+  with(split_df[[i]], points(airT_mean ~ time, type = "l", col = colours[i], lwd = 0.75))
+}
+dev.off()
