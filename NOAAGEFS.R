@@ -1,23 +1,7 @@
-#' Reading NOAA GEFS Forecasts from netcdf
-#'
-#' @param base_dir directory of the particular NOAA GEFS model (i.e., NOAAGEFS_1hr)
-#' @param date date in YYYY-MM-DD of the forecast
-#' @param cycle cycle of the forecast; the options are 00, 06, 12, 18
-#' @param sites list if siteID
-#'
-#' @return data frame
-#' @export
-#'
-#' @examples
-#' 
-#' library(tidyverse)
-#' base_dir <- "/efi_neon_challenge/drivers/noaa/NOAAGEFS_1hr"
-#' date <- "2020-10-21"
-#' cycle <- "00"
-#' sites <- c("ABBY", "BART")
-#' noaa_gefs_read(base_dir, date, cycle, sites)
-#' 
-#' 
+# script for reading, summarising and exporting NOAA GEFS netcdf files to CSV
+# 1. data read function from EFI (modified)
+# 2. examine data and export plot
+# 3. compile data for all sites and export to CSV
 
 library(tidyverse)
 library(ncdf4)
@@ -26,14 +10,14 @@ library(gdalUtils)
 library(tidync)
 library(stars)
 
-# reading data function ####
+# 1. ####
 noaa_gefs_read <- function(base_dir, date, cycle, sites){
   
   if(!(cycle %in% c("00","06","12","18"))){
     stop("cycle not available cycles of 00, 06, 12, 18")
   }
   
-  cf_met_vars <- c("air_temperature")
+  cf_met_vars <- c("air_temperature", "air_pressure", "relative_humidity", "surface_downwelling_longwave_flux_in_air", "surface_downwelling_shortwave_flux_in_air", "precipitation_flux", "specific_humidity", "cloud_area_fraction", "wind_speed")
   
   combined_met <- NULL
   for(k in 1:length(date)){
@@ -80,7 +64,7 @@ noaa_gefs_read <- function(base_dir, date, cycle, sites){
 }
 
 
-# bart ####
+# bart air temp plotting ####
 # define settings
 base_dir <- "./efi_neon_challenge/drivers/noaa/NOAAGEFS_1hr"
 date <- c("2020-10-01", "2020-11-01", "2020-12-01", "2021-01-01")
@@ -92,7 +76,7 @@ df = noaa_gefs_read(base_dir, date, cycle, sites) %>%
   dplyr::filter(ensemble != "0")
 
 # generate statistics
-df_stats = aggregate(data = df, air_temperature ~ siteID + time + preddate, FUN = function(x) c(avg = mean(x)/10,upper = (mean(x) + sd(x)/sqrt(length(x)))/10, lower = (mean(x) - sd(x)/sqrt(length(x)))/10), simplify = TRUE, drop = TRUE)
+df_stats = aggregate(data = df, air_temperature ~ siteID + time + preddate, FUN = function(x) c(avg = mean(x-273.15),upper = mean(x-273.15) + sd(x-273.15)/sqrt(length(x-273.15)), lower = mean(x-273.15) - sd(x-273.15)/sqrt(length(x-273.15))), simplify = TRUE, drop = TRUE)
 
 # reformat for convenience
 val<-data.frame(df_stats[["air_temperature"]])
@@ -136,3 +120,15 @@ for(i in (c(2:length(split_df)))){
   with(split_df[[i]], points(airT_mean ~ time, type = "l", col = colours[i], lwd = 0.75))
 }
 dev.off()
+
+# load and export dataset ####
+# define settings
+base_dir <- "./efi_neon_challenge/drivers/noaa/NOAAGEFS_1hr"
+date <- "2020-10-01"
+cycle <- "00"
+sites <- c("BART", "KONZ", "OSBS", "SRER")
+
+df = noaa_gefs_read(base_dir, date, cycle, sites) %>% 
+  dplyr::filter(ensemble != "0") %>% 
+  pivot_longer(cols = c(air_temperature, air_pressure, relative_humidity, surface_downwelling_longwave_flux_in_air, surface_downwelling_shortwave_flux_in_air, precipitation_flux, specific_humidity, cloud_area_fraction, wind_speed), names_to = "vars")
+
