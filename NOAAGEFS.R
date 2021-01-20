@@ -124,11 +124,19 @@ dev.off()
 # load and export dataset ####
 # define settings
 base_dir <- "./efi_neon_challenge/drivers/noaa/NOAAGEFS_1hr"
-date <- "2020-10-01"
+date <- "2021-01-01"
 cycle <- "00"
 sites <- c("BART", "KONZ", "OSBS", "SRER")
 
+# load data and format for export
 df = noaa_gefs_read(base_dir, date, cycle, sites) %>% 
   dplyr::filter(ensemble != "0") %>% 
   pivot_longer(cols = c(air_temperature, air_pressure, relative_humidity, surface_downwelling_longwave_flux_in_air, surface_downwelling_shortwave_flux_in_air, precipitation_flux, specific_humidity, cloud_area_fraction, wind_speed), names_to = "vars")
 
+# change temperature units from kelvin to celsius
+df[df$vars == "air_temperature",]$value = df[df$vars == "air_temperature",]$value - 273.15
+
+# change names
+names(df) = c("siteID", "ensemble", "forecast_time", "forecast_startdate", "variable", "value")
+
+write.csv(df, paste("NOAA_GEFS_CSVs/", date, "_allvariables.csv", sep = ""))
