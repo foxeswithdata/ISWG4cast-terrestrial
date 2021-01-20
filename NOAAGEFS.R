@@ -1,5 +1,7 @@
 # script for reading, summarising and exporting NOAA GEFS netcdf files to CSV
-# 1. data read function from EFI (modified)
+# 1. data read function
+#     - NOAA GEFS data were taken from: https://data.ecoforecast.org/minio/drivers/
+#     - function for loading netCDF files was modified from https://github.com/eco4cast/neon4cast-shared-utilities/blob/main/noaa_gefs_read.R
 # 2. examine data and export plot
 # 3. compile data for all sites and export to CSV
 
