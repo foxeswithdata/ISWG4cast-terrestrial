@@ -78,6 +78,8 @@ df = noaa_gefs_read(base_dir, date, cycle, sites) %>%
   dplyr::filter(ensemble != "0")
 
 # generate statistics
+
+
 df_stats = aggregate(data = df, air_temperature ~ siteID + time + preddate, FUN = function(x) c(avg = mean(x-273.15),upper = mean(x-273.15) + sd(x-273.15)/sqrt(length(x-273.15)), lower = mean(x-273.15) - sd(x-273.15)/sqrt(length(x-273.15))), simplify = TRUE, drop = TRUE)
 
 # reformat for convenience
@@ -85,6 +87,8 @@ val<-data.frame(df_stats[["air_temperature"]])
 df_stats$airT_mean<-val$avg
 df_stats$airT_upperconf<-val$upper
 df_stats$airT_lowerconf<-val$lower
+
+str(df_stats)
 
 # remove original variables
 df_stats = df_stats %>% 
@@ -105,7 +109,7 @@ xmin = min(df_stats$time)
 xmax = max(df_stats$time)
 
 # plot
-tiff(file = paste(sites[1], "airtemp.tif", sep = ""), width =1600, height = 1200, units = "px", res = 200)
+#tiff(file = paste(sites[1], "airtemp.tif", sep = ""), width =1600, height = 1200, units = "px", res = 200)
 colours = rainbow(length(split_df))
 with(split_df[[1]], plot(airT_mean ~ time, 
                      type = "l",
@@ -142,3 +146,16 @@ df[df$vars == "air_temperature",]$value = df[df$vars == "air_temperature",]$valu
 names(df) = c("siteID", "ensemble", "forecast_time", "forecast_startdate", "variable", "value")
 
 write.csv(df, paste("NOAA_GEFS_CSVs/", date, "_allvariables.csv", sep = ""))
+
+
+#####
+
+# Alex makes a quick ggplot for the January forcast
+
+library(ggplot2)
+
+str(df)
+
+ggplot(df, aes(x=forecast_time, y=value, col=siteID))+geom_point()+facet_grid(variable~siteID, scales="free_y")
+
+
