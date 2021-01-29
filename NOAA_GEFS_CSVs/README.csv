@@ -1,0 +1,7 @@
+Column name,Description
+siteID,NEON site for which the forecast was made
+ensemble,Forecast replicate (01-30)
+forecast_time,Time for which the forecast was made; forecasts start at midnight the day the forecasts are generated and extend out 35 days
+forecast_startdate,Date on which the forecasts were generated
+variable,Environmental variable being forecasted
+value,Numerical value of the environmental being forecasted
