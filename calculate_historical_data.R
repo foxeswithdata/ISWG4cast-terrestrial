@@ -6,12 +6,10 @@ library(lubridate)
 library(contentid)
 library(data.table)
 
-install.packages("EML")
-
 # Thanks to EFI, the target variables that have been passed through a QA filter are available here. 
 #The NEE, LE, and Soil moisture are contained with this dataet. 
-half<-fread("data_folder/targets-terrestrial/terrestrial_30min-targets.csv.gz")
-daily<-fread("data_folder/targets-terrestrial/terrestrial_daily-targets.csv.gz")
+half<-fread("terrestrial_30min-targets.csv.gz")
+daily<-fread("terrestrial_daily-targets.csv.gz")
 
 
 tail(daily) # goes to december 2020
@@ -73,7 +71,7 @@ month<-aggregate(list(value=da$value), by=list(siteID=da$siteID,target=da$target
 ## Here is where I might want to do 95% confidence?
 mse<-aggregate(list(se=da$se), by=list(siteID=da$siteID, target=da$target),FUN="mean", na.rm=T)
 head(mse)
-
+head(month)
 
 
 month$site.target<-paste(month$siteID, month$target)
@@ -81,6 +79,9 @@ mse$site.target<-paste(mse$siteID, mse$target)
 
 month$se<-mse$se[match(month$site.target, mse$site.target)]
 
+ja$site.target<-paste(ja$siteID, ja$target)
+
+head(ja)
 
 # match in the monthly values into ja
 ja$m.avg<-month$value[match(ja$site.target, month$site.target)]
@@ -89,6 +90,7 @@ ja$se<-month$se[match(ja$site.target, mse$site.target)]
 # only 1 year
 y21<-ja[ja$year=="2020",]
 
+y21
 d<-ggplot(y21, aes(x=day, y=m.avg))+  geom_point()+
   geom_errorbar(aes(ymin=m.avg-se, ymax=m.avg+se), width=.2)+
   facet_grid(target~siteID, scales="free_y")+ggtitle("Monthly average from half hours")
@@ -100,7 +102,7 @@ library(ggpubr)
 ggarrange(a,b,c,d, common.legend = T, nrow=1)
 
 
-
+######### Alright, now format the data
 names(ja)
 us<-y21
 use<-us[,c(1,2,5,6,7,10)]
@@ -128,11 +130,16 @@ head(fin)
 
 ## pick which rows you want to keep using
 #final<-fin[,c("siteID","statistic","forecast","data_assimilation","time","nee","le","vcwc")]
-final<-fin[,c(2,8,9,10,1,6,5,7)]
+dim(fin)
+names(fin)
+final<-fin[,c(2,6,7,8,1,4,3,5)]
 
 # too many rows!
 fin<-final[1:140,]
-fins<-final[365:504,]
+table(fin$time)
+
+fins<-final[241:380,]
+table(fins$time)
 
 fi<-rbind(fin, fins)
 fi$time<-ymd(fi$time)
@@ -144,5 +151,10 @@ fi$date<-paste(fi$year, fi$month, fi$day, sep="-")
 fi$time<-ymd(fi$date)
 names(fi)
 fi<-fi[,1:8]
+
+head(fi)
+table(fi$time)
+tail(fi)
+table(fi$statistic)
 
 write.csv(fi, file="terrestrial-2021-01-01-ISWG.csv")

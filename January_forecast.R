@@ -14,6 +14,10 @@ library(jsonlite)
 ## trying to upload a .csv file with the metadata documentation.
   # here is the .csv file I'd like to upload
 janfx<-read.csv("terrestrial-2021-01-01-ISWG.csv")
+
+head(janfx)
+tail(janfx)
+
 janfx$time<-ymd(janfx$time)
 janfx<-janfx[,-1]
 str(janfx)
