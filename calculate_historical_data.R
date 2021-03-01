@@ -18,10 +18,12 @@ daily$month<-month(daily$time)
 daily$day<-day(daily$time)
 daily$year<-year(daily$time)
 
+dec<-daily[daily$month=="12",]
 jan<-daily[daily$month=="1",]
 feb<-daily[daily$month=="2",]
-dec<-daily[daily$month=="12",]
-wind<-rbind(jan,feb,dec)
+mar<-daily[daily$month=="3",]
+
+wind<-rbind(feb, mar)
 ja<-gather(wind,"target","value",3:5)
 
 a<-ggplot(ja, aes(x=day, y=value, shape=as.factor(month), col=as.factor(year)))+geom_point()+
@@ -41,9 +43,9 @@ ha$year<-year(ha$time)
 head(ha,200)
 
 Jan<-ha[ha$month==1,]
+Jan<-ha[ha$month==2,]
 
-
-b<-ggplot(Jan, aes(x=day, y=value, shape=as.factor(month), col=as.factor(year)))+geom_point()+
+b<-ggplot(Feb, aes(x=day, y=value, shape=as.factor(month), col=as.factor(year)))+geom_point()+
   facet_grid(target~siteID, scales="free_y")+ggtitle("Half-hour")
 b
 
@@ -135,20 +137,28 @@ names(fin)
 final<-fin[,c(2,6,7,8,1,4,3,5)]
 
 # too many rows!
-fin<-final[1:140,]
+fin<-final[1:144,]
 table(fin$time)
 
-fins<-final[241:380,]
+
+final[final$statistic=="sd",]
+
+fins<-final[241:384,]
 table(fins$time)
 
 fi<-rbind(fin, fins)
+head(fi)
+
 fi$time<-ymd(fi$time)
 fi$year<-2021
 fi$month<-month(fi$time)
 fi$day<-day(fi$time)
 
 fi$date<-paste(fi$year, fi$month, fi$day, sep="-")
+head(fi)
+
 fi$time<-ymd(fi$date)
+
 names(fi)
 fi<-fi[,1:8]
 
@@ -157,5 +167,8 @@ table(fi$time)
 tail(fi)
 table(fi$statistic)
 
-write.csv(fi, file="terrestrial-2021-01-01-ISWG.csv")
+write.csv(fi, file="terrestrial-2021-02-01-ISWG.csv")
 
+
+git config --global user.email "bearsofthemoss@gmail.com "
+git config --global user.name "Alex Y"

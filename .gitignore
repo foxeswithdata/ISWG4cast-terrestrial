@@ -3,3 +3,7 @@
 .RData
 .Ruserdata
 *.pper
+
+
+ git config --global user.email "bearsofthemoss@gmail.com "
+  git config --global user.name "Alex Y"
