@@ -1,0 +1,404 @@
+---
+  title: "Example metadata for a Lotka-Volterra population growth forecast"
+output: rmarkdown::html_document
+vignette: >
+  %\VignetteIndexEntry{Logistic Growth Simulation}
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
+---
+  
+#### Code {.tabset}
+  
+##### R
+  
+```{r setup, message=FALSE}
+library(EML)
+library(ncdf4)
+library(emld)
+library(lubridate)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+emld::eml_version("eml-2.2.0")
+set.seed(42)
+```
+
+# Standard Option 3: summary CSV
+
+Convert to a flat file format (CSV) with forecast distribution summaries saved
+
+#### Code {.tabset}
+
+##### R
+
+```{r}
+dfs = read.csv("terrestrial-2021-01-01-ISWG.csv")
+## calculate summary statistics across ensemble members and output variables
+# dfs <- df_combined %>% pivot_longer(cols=5:6,names_to="vars") %>%  ## make species a column
+#                    group_by(time, depth,obs_flag,species,forecast,data_assimilation) %>%
+#                    summarize(mean = mean(value),
+#                              sd   = sd(value),
+#                              Conf_interv_02.5 = quantile(value, 0.025),
+#                              Conf_interv_97.5 = quantile(value, 0.975)) %>%
+#                    pivot_longer(7:10,names_to="statistic")  %>% ## make statistic column
+#                    pivot_wider(names_from=species,values_from = value) ## go back to species wide
+## recode statistics
+# dfs$statistic[dfs$obs_flag == 1 & dfs$statistic == "sd"] <- "se"
+# dfs$statistic[dfs$obs_flag == 2 & dfs$statistic == "Conf_interv_02.5"] <- "Pred_interv_0.25"
+# dfs$statistic[dfs$obs_flag == 2 & dfs$statistic == "Conf_interv_02.5"] <- "Pred_interv_0.25"
+# head(dfs)
+# write.csv(dfs, file = "logistic-forecast-summary-multi-variable-multi-depth.csv")
+```
+
+#### {-}
+
+# Standardized Metadata
+
+### Forecast output entity: dataTable
+Let's begin by documenting the metadata of the forecast output data table itself, which we'll do using EML's `dataTable` entity. In this example we'll assume we're working with format 2 (ensemble CSV), though most of the metadata would be identical for all three formats.
+             
+To start, the `attributes` table stores the basic metadata about the variable names and units.
+             
+#### Code {.tabset}
+             
+##### R
+             
+```{r}
+## define variable names, units, etc
+## in practice, this might be kept in a spreadsheet
+attributes <- tibble::tribble(
+~attributeName,     ~attributeDefinition,                          ~unit,                  ~formatString, ~numberType, ~definition,
+"time",              "[dimension]{time}",                          "year",                 "YYYY-MM-DD",  "numberType", NA,
+"statistic",          "[dimension]{type of statistic}",            "dimensionless",         NA,           "character",  "Type of statistic",
+"siteID",             "[dimension]{neon site}",                    "dimensionless",         NA,           "character",  "The 4-digit code for NEON site ID",
+"obs_flag",          "[dimension]{observation error}",             "dimensionless",         NA,           "integer",    NA,
+"nee",               "[variable]{net ecosystem exchange}",         "dimensionless",         NA,           "real",       NA,
+"le",                "[variable]{latent heat}",                    "dimensionless",         NA,           "real",       NA,
+"vswc",               "[variable]{volumetric soil water content}",  "dimensionless",         NA,           "real",       NA,
+"forecast",          "[flag]{whether time step assimilated data}", "dimensionless",         NA,           "integer",    NA,
+"data_assimilation", "[flag]{whether time step assimilated data}", "dimensionless",         NA,           "integer",    NA
+) 
+## note: EML uses a different unit standard than UDUNITS. For now use EML. EFI needs to provide a custom unitList.
+attributes
+attrList <- set_attributes(attributes, 
+                           col_classes = c("Date", "character", "character", "numeric","numeric",
+                                           "numeric","numeric", "numeric","numeric"))
+```
+             
+#### {-}
+Note that the EFI standard extends the EML `attibuteDefinition` to include a [variable_type] and {variable_definition}.
+The options for [variable_type] include:
+* dimension
+* variable = output variable
+* diagnostic = variable output purely for diagnostic purposes
+* observation = data that is or could be compared to an output_variable
+* obs_error
+* flag
+* initial_condition
+* driver
+* parameter
+* random_effect
+* process_error
+           
+We then link the attribute information with the info about a particular file             
+
+#### Code {.tabset}
+             
+##### R
+             
+```{r}
+## sets metadata about the file itself (name, file type, size, MD5, etc)
+physical <- set_physical("terrestrial-2021-01-01-ISWG.csv",
+                                      recordDelimiter='\n')
+## set metadata for the file as a whole
+dataTable <- eml$dataTable(
+  entityName = "forecast",  ## this is a standard name to allow us to distinguish this entity from 
+  entityDescription = "Forecast of NEE and LE for four NEON sites",
+  physical = physical,
+  attributeList = attrList)
+```
+             
+#### {-}
+             
+             
+Here `entityName = "forecast"` is a standard name within the EFI standard to allow us to distinguish this entity from metadata about parameters, drivers, etc.
+             
+There's a lot more optional terminology that could be exploited here -- for instance, the specification lets us define different missing value codes (and explanations) for each column, and allows us to indicate `precision`, `minimum` and `maximum`.  
+
+Note that `physical` type can document almost any formats as well, including 
+NetCDF etc.  A NetCDF file would still document the variables measured in much 
+the same way regardless of the underlying representation. 
+
+### Provenance 
+Now that we've documented the actual data.frame itself, we can add additional metadata to the record describing our forecast, which is essential for citing, discovering, and interpreting the result.  We start with some authorship information. 
+                  
+#### Code {.tabset}
+             
+##### R
+             
+```{r}
+me <- list(list(individualName = list(givenName = "Alex", 
+                                 surName = "Young")),
+           list(individualName = list(givenName = "Kathryn",
+                                 surName = "Fuller",
+                                 id = "https://orcid.org/0000-0001-9100-7635")),
+           list(individualName = list(givenName = "Elisa",
+                                 surName = "Stefaniak",
+                                 id = "https://orcid.org/0000-0003-2998-5619")),
+          list(individualName =   list(givenName = "Jenna",
+                                 surName = "Zukswert",
+                                 id = "https://orcid.org/0000-0003-2246-0406")),
+          list(individualName =  list(givenName = "Laura",
+                                 surName = "Super")))
+```
+             
+             
+#### {-}
+             
+### Coverage
+             
+Set Taxonomic, Temporal, and Geographic Coverage.  (Look, apparently we're modeling population densities of *Gloeotrichia echinulata* and *Anabaena circinalis* cyanobacterium in Lake Sunapee, NH, USA)
+
+#### Code {.tabset}
+
+##### R
+
+```{r}
+# taxa <- tibble::tribble(
+#   ~Genus,      ~Species,
+# "Gloeotrichia", "echinulata",
+# "Anabaena",     "circinalis")
+coverage <-
+  set_coverage(begin = first(dfs$time),
+               end = last(dfs$time))
+coverage <- list(temporalCoverage = coverage$temporalCoverage)
+```
+
+#### {-}
+
+### Keywords
+
+Set key words.  We will need to develop a EFI controlled vocabulary
+
+#### Code {.tabset}
+
+##### R
+
+```{r}
+keywordSet <- list(
+    list(
+        keywordThesaurus = "EFI controlled vocabulary",
+        keyword = list("forecast",
+                    "timeseries")
+    ))
+```
+
+#### {-}
+
+### Abstract
+
+Our dataset needs an abstract describing what this is all about.
+
+#### Code {.tabset}
+
+##### R
+
+```{r}
+abstract_text <- system.file("extdata", "abstract.md", package="EFIstandards", mustWork = TRUE)
+```
+
+#### {-}
+
+### Dataset
+
+Next, we'll combine these various bits to document the output dataset as a whole
+                                                                 
+#### Code {.tabset}
+                                                                 
+##### R
+                                                                 
+```{r}
+dataset = eml$dataset(
+title = "Summarized historical data as a forecast",
+creator = me,
+contact = me[[2]], # contact needs an id
+pubDate = "2021-02-02",
+intellectualRights = "http://www.lternet.edu/data/netpolicy.html.",
+abstract =  "",
+dataTable = dataTable,
+keywordSet = keywordSet,
+coverage = coverage)
+```
+                                                                 
+#### {-}
+                                                                 
+## Forecast-specific additionalMetadata
+                                                                 
+The EFI standard is using EML's `additionalMetadata` capacity. Section 2.1 of the EFI standard describes both the basic elements (2.1.1) and the info about model structure and uncertainty (2.1.2).
+
+#### Code {.tabset}
+
+##### R
+
+```{r}
+additionalMetadata <- eml$additionalMetadata(
+  metadata = list(
+    forecast = list(
+## Basic elements
+      timestep = "1 day", ## should be udunits parsable; already in coverage -> temporalCoverage?
+      forecast_horizon = "35 days",
+      forecast_issue_time = "2021-02-02",
+      forecast_iteration_id = "80808080",
+      forecast_project_id = "ISWG",
+      metadata_standard_version = "0.3",
+      model_description = list(
+        forecast_model_id = "80808080",
+        name = "historical data summary as forecast",
+        type = "statistical",
+        repository = ""
+      ),
+## MODEL STRUCTURE & UNCERTAINTY CLASSES
+      initial_conditions = list(
+        # Possible values: absent, present, data_driven, propagates, assimilates
+        status = "absent"
+      ),
+      drivers = list(
+        status = "absent"
+      ),
+      parameters = list(
+        status = "absent"
+      ),
+      random_effects = list(
+        status = "absent"
+      ),
+      process_error = list(
+        status = "propagates",
+        propagates = list(
+          type = "analytic"
+        ),
+        complexity = 1,   
+        covariance = FALSE
+      ),
+      obs_error = list(
+        status = "absent"
+      )
+    ) # forecast
+  ) # metadata
+) # eml$additionalMetadata
+```
+
+#### {-}
+
+Within the `additionalMetadata`, we anticipate the model structure info will be the most challenging to document.
+All six model structural elements / uncertainty classes need to be documented, even if just to record that a specific element is absent in the model. The six classes are:
+
+Class              | Description
+------------------ | -------------------------------------------------------
+initial_conditions | Uncertainty in the initialization of state variables (Y)
+drivers            | Uncertainty in model drivers, covariates, and exogenous scenarios (X)
+parameters         | Uncertainty in model parameters ($\theta$) 
+random_effects     | Unexplained variability and heterogeneity in model parameters ($\alpha$) 
+obs_error          | Uncertainty in the observations of the output variables (g)
+process_error      | Dynamic uncertainty in the process model ($\epsilon$)
+
+Each class has a very similar structure and the only required element in each is `status` which can take on the following valid values
+
+status      | Description
+----------- | --------------------------------------------------------------
+absent      | This model does not contain this concept (e.g. a linear regression model doesn't have initial conditions, random effects, or process_error). 
+present     | The model contains this concept (e.g. the model has parameters), but the values used are not derived from data and no uncertainty is represented
+data_driven | The model contains this concept and the inputs are data driven but uncertainty in this input is not explicitly propagated into predictions.
+propagates  | The model propagates uncertainty about this term into forecasts
+assimilates | The model iteratively updates this term through data assimilation.
+             
+Except for 'absent' this list is ordinal (e.g. data_driven implies present)
+             
+Next, the `<complexity>` tag is recommended, but not required, and should list the size/dimension of each status/uncertainty class at a single location (per dimensions defined above). For example, the logistic model has two initial conditions (n[1], n[2]), six parameters (r, K, and alpha for each species), and both process and observation error on the two state variables. `absent` statuses don't need to be documented as 0 as this is implied.
+
+The `<covariance>` tag states whether the errors/uncertainties within an uncertainty class are being treated as independent or not.
+
+Finally, the `<propagation>` and `<assimilation>` tags provide additional information about the methods used (see EFI standard doc). 
+
+## Assembling and validating the metadata
+
+All we need now is to combine the dataset metadata with the forecast additionalMetadata 
+
+#### Code {.tabset}
+
+##### R
+
+```{r}
+my_eml <- eml$eml(dataset = dataset,
+           additionalMetadata = additionalMetadata,
+           packageId = "80808080", 
+           system = "datetime"  ## system used to generate packageId
+           )
+```
+
+#### {-}
+
+Once we have finished building our EML metadata, we can confirm it is valid. This will catch any missing elements.  (Recall that what is 'required' depends on what you include -- for example, you don't have to document a `dataTable` at all, but if you do, you have to document the "physical" file format it is in (e.g. `csv`) and the attributes and units it uses!)
+
+#### Code {.tabset}
+
+##### R
+##### HERE
+```{r}
+## check base EML
+eml_validate(my_eml)
+## check that the EML is also a valid EFI forecast
+EFIstandards::forecast_validator(my_eml)
+```
+
+#### {-}
+
+We are now ready to write out a valid EML document: 
+  
+#### Code {.tabset}
+  
+##### R
+  
+```{r}
+write_eml(my_eml, "forecast-eml.xml")
+```
+
+#### {-}
+
+At this point, we could easily upload this metadata along with the data itself 
+to a repository (e.g. DataONE) manually or via an API.
+
+We can also generate a JSON-LD version of EML:
+  
+#### Code {.tabset}
+  
+##### R
+  
+```{r}
+emld::as_json(as_emld("forecast-eml.xml"), file = "forecast-eml.json")
+```
+
+
+```{r eval=FALSE, echo=FALSE}
+# NOTE: the output files in this vignette 
+# should be stored in the package. to updat them change this chunk to eval=TRUE
+devtools::load_all()
+emlname <- system.file("extdata", "forecast-eml.xml", package="EFIstandards")
+write_eml(my_eml, emlname)
+emldname <- system.file("extdata", "forecast-eml.json", package="EFIstandards")
+emld::as_json(as_emld(emlname), file = emldname)
+ncpkgfile <- system.file("extdata", ncfname, package="EFIstandards")
+# TODO  -- add writing the nc file here too
+file.copy(ncfname,  ncpkgfile, overwrite=TRUE)
+```
+
+
+```{r include=FALSE}
+## Cleanup
+lapply(list.files(pattern = "[.]nc"), unlink)
+lapply(list.files(pattern = "[.]csv"), unlink)
+lapply(list.files(pattern = "[.]json"), unlink)
+lapply(list.files(pattern = "[.]xml"), unlink)
+```
+
+#### {-}

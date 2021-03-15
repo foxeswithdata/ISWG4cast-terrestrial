@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.2" packageId="80808080" system="datetime" xsi:schemaLocation="https://eml.ecoinformatics.org/eml-2.2.0 https://eml.ecoinformatics.org/eml-2.2.0/eml.xsd">
+  <dataset>
+    <title>Summarized historical data as a forecast</title>
+    <creator>
+      <individualName>
+        <givenName>Alex</givenName>
+        <surName>Young</surName>
+      </individualName>
+    </creator>
+    <creator id="https://orcid.org/0000-0001-9100-7635">
+      <individualName>
+        <givenName>Kathryn</givenName>
+        <surName>Fuller</surName>
+      </individualName>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Elisa</givenName>
+        <surname>Stefaniak</surname>
+      </individualName>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Jenna</givenName>
+        <surName>Zukswert</surName>
+      </individualName>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Laura</givenName>
+        <surName>Super</surName>
+      </individualName>
+    </creator>
+    <pubDate>2021-02-02</pubDate>
+    <abstract/>
+    <keywordSet>
+      <keyword>forecast</keyword>
+      <keyword>timeseries</keyword>
+      <keywordThesaurus>EFI controlled vocabulary</keywordThesaurus>
+    </keywordSet>
+    <intellectualRights>http://www.lternet.edu/data/netpolicy.html.</intellectualRights>
+    <coverage>
+      <geographicCoverage id="BART">
+        <geographicDescription>BART, D01</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-71.287375</westBoundingCoordinate>
+          <eastBoundingCoordinate>-71.287375</eastBoundingCoordinate>
+          <northBoundingCoordinate>44.063889</northBoundingCoordinate>
+          <southBoundingCoordinate>44.063889</southBoundingCoordinate>
+          <boundingAltitudes>
+            <altitudeMinimum>274.0493</altitudeMinimum>
+            <altitudeMaximum>274.0493</altitudeMaximum>
+            <altitudeUnits>meter</altitudeUnits>
+          </boundingAltitudes>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <geographicCoverage id="KONZ">
+        <geographicDescription>KONZ, D06</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-96.563075</westBoundingCoordinate>
+          <eastBoundingCoordinate>-96.563075</eastBoundingCoordinate>
+          <northBoundingCoordinate>39.100774</northBoundingCoordinate>
+          <southBoundingCoordinate>39.100774</southBoundingCoordinate>
+          <boundingAltitudes>
+            <altitudeMinimum>414.4253</altitudeMinimum>
+            <altitudeMaximum>414.4253</altitudeMaximum>
+            <altitudeUnits>meter</altitudeUnits>
+          </boundingAltitudes>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <geographicCoverage id="OSBS">
+        <geographicDescription>OSBS, D03</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-81.993431</westBoundingCoordinate>
+          <eastBoundingCoordinate>-81.993431</eastBoundingCoordinate>
+          <northBoundingCoordinate>29.689282</northBoundingCoordinate>
+          <southBoundingCoordinate>29.689282</southBoundingCoordinate>
+          <boundingAltitudes>
+            <altitudeMinimum>46.0339</altitudeMinimum>
+            <altitudeMaximum>46.0339</altitudeMaximum>
+            <altitudeUnits>meter</altitudeUnits>
+          </boundingAltitudes>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <geographicCoverage id="SRER">
+        <geographicDescription>SRER, D14</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-110.835490</westBoundingCoordinate>
+          <eastBoundingCoordinate>-110.835490</eastBoundingCoordinate>
+          <northBoundingCoordinate>31.910680</northBoundingCoordinate>
+          <southBoundingCoordinate>31.910680</southBoundingCoordinate>
+          <boundingAltitudes>
+            <altitudeMinimum>997.476</altitudeMinimum>
+            <altitudeMaximum>997.476</altitudeMaximum>
+            <altitudeUnits>meter</altitudeUnits>
+          </boundingAltitudes>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>2021-01-01</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>2021-02-04</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <contact/>
+    <dataTable>
+      <entityName>forecast</entityName>
+      <entityDescription>Forecast of NEE and LE for four NEON sites</entityDescription>
+      <physical>
+        <objectName>terrestrial-2021-01-01-ISWG.csv</objectName>
+        <size unit="bytes">17081</size>
+        <authentication method="MD5">f875eea8d59667385f80f96a4d7df39c</authentication>
+        <dataFormat>
+          <textFormat>
+            <recordDelimiter>
+</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>time</attributeName>
+          <attributeDefinition>[dimension]{time}</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>statistic</attributeName>
+          <attributeDefinition>[dimension]{type of statistic}</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain/>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>siteID</attributeName>
+          <attributeDefinition>[dimension]{neon site}</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain/>
+            </nominal>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>obs_flag</attributeName>
+          <attributeDefinition>[dimension]{observation error}</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>integer</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>nee</attributeName>
+          <attributeDefinition>[variable]{net ecosystem exchange}</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>le</attributeName>
+          <attributeDefinition>[variable]{latent heat}</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>vswc</attributeName>
+          <attributeDefinition>[variable]{volumetric soil water content}</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>forecast</attributeName>
+          <attributeDefinition>[flag]{whether time step assimilated data}</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>integer</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>data_assimilation</attributeName>
+          <attributeDefinition>[flag]{whether time step assimilated data}</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>integer</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+        </attribute>
+      </attributeList>
+    </dataTable>
+  </dataset>
+  <additionalMetadata>
+    <metadata>
+      <forecast>
+        <drivers>
+          <status>absent</status>
+        </drivers>
+        <forecast_horizon>35 days</forecast_horizon>
+        <forecast_issue_time>2021-02-02</forecast_issue_time>
+        <forecast_iteration_id>80808080</forecast_iteration_id>
+        <forecast_project_id>ISWG</forecast_project_id>
+        <initial_conditions>
+          <status>absent</status>
+        </initial_conditions>
+        <metadata_standard_version>0.3</metadata_standard_version>
+        <model_description>
+          <forecast_model_id>80808080</forecast_model_id>
+          <name>historical data summary as forecast</name>
+          <repository/>
+          <type>statistical</type>
+        </model_description>
+        <obs_error>
+          <status>absent</status>
+        </obs_error>
+        <parameters>
+          <status>absent</status>
+        </parameters>
+        <process_error>
+          <complexity>1</complexity>
+          <covariance>FALSE</covariance>
+          <propagates>
+            <type>analytic</type>
+          </propagates>
+          <status>propagates</status>
+        </process_error>
+        <random_effects>
+          <status>absent</status>
+        </random_effects>
+        <timestep>1 day</timestep>
+      </forecast>
+    </metadata>
+  </additionalMetadata>
+</eml:eml>
