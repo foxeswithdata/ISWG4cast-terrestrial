@@ -55,11 +55,11 @@ table(s$etr)
 write.csv(s, file="GEE_data.csv")
 
 
-ggplot(iswg[iswg$variable=="smap",], aes(x=Date, y=value, col=siteID))+geom_point()
+ggplot(iswg[iswg$variable=="smap", ], aes(x=Date, y=value, col=siteID))+geom_point()
 
-ggplot(iswg[iswg$variable=="GPP",], aes(x=Date, y=value, col=siteID))+geom_point()
+ggplot(iswg[iswg$variable=="GPP", ], aes(x=Date, y=value, col=siteID))+geom_point()
 
-ggplot(iswg[iswg$variable=="pr",], aes(x=Date, y=value, col=siteID))+geom_point()
+ggplot(iswg[iswg$variable=="pr", ], aes(x=Date, y=value, col=siteID))+geom_point()
 
 
 ggplot(s, aes(x=Date, y=GPP, col=siteID))+geom_point()
