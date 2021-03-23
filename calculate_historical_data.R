@@ -5,14 +5,16 @@ library(tidyverse)
 library(lubridate)
 library(contentid)
 library(data.table)
+library(ggplot2)
 
 # Thanks to EFI, the target variables that have been passed through a QA filter are available here. 
 #The NEE, LE, and Soil moisture are contained with this dataet. 
-half<-fread("terrestrial_30min-targets.csv.gz")
-daily<-fread("terrestrial_daily-targets.csv.gz")
+
+half<-fread("march_terrestrial_30min-targets.csv.gz")
+daily<-fread("march_terrestrial_daily-targets.csv.gz")
 
 
-tail(daily) # goes to december 2020
+tail(daily) # goes to December 2020
 
 daily$month<-month(daily$time)
 daily$day<-day(daily$time)
@@ -22,8 +24,14 @@ dec<-daily[daily$month=="12",]
 jan<-daily[daily$month=="1",]
 feb<-daily[daily$month=="2",]
 mar<-daily[daily$month=="3",]
+apr<-daily[daily$month=="4",]
 
-wind<-rbind(feb, mar)
+ggplot(daily, aes(x=month, y=nee ))+geom_jitter()+facet_wrap(~siteID)+ggtitle("NEE")
+ggplot(daily, aes(x=month, y=le ))+geom_jitter()+facet_wrap(~siteID)+ggtitle("LE")
+ggplot(daily, aes(x=month, y=vswc ))+geom_jitter()+facet_wrap(~siteID)+ggtitle("soil moisture")
+
+
+wind<-rbind(mar, feb, apr)
 ja<-gather(wind,"target","value",3:5)
 
 a<-ggplot(ja, aes(x=day, y=value, shape=as.factor(month), col=as.factor(year)))+geom_point()+
@@ -44,8 +52,18 @@ head(ha,200)
 
 Jan<-ha[ha$month==1,]
 Jan<-ha[ha$month==2,]
+Mar<-ha[ha$month==3,]
 
-b<-ggplot(Feb, aes(x=day, y=value, shape=as.factor(month), col=as.factor(year)))+geom_point()+
+
+
+ggplot(ha, aes(x=month, y=value, col=siteID ))+geom_jitter()+facet_grid(target~siteID, scales="free")
+
+
+
+
+
+
+b<-ggplot(Mar, aes(x=day, y=value, shape=as.factor(month), col=as.factor(year)))+geom_point()+
   facet_grid(target~siteID, scales="free_y")+ggtitle("Half-hour")
 b
 

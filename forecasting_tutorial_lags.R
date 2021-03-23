@@ -5,14 +5,26 @@ library(lubridate)
 gee<-read.csv("GEE_Data.csv")
 gee$Date<-as_date(gee$Date)
 gee$Year<-year(gee$Date)
+gee$week<-week(gee$Date)
 head(gee)
 library(tidyr)
+
 g<-gather(gee, "variable","value",7:17)
 dim(g)
 head(g)
-gs<-aggregate(g$value,by=list(year=g$Year ,month=g$Month,siteID=g$siteID, variable=g$variable ), FUN=mean, na.rm=T )
+
+gs<-aggregate(g$value,by=list(year=g$Year ,month=g$Month,week=g$week,siteID=g$siteID, variable=g$variable ), FUN=mean, na.rm=T )
+head(gs)
 s<-spread(gs, "variable","x")
 head(s)
+
+
+
+library(ggplot2)
+ggplot(gs, aes(x=week, y=x, col=siteID))+geom_point()+
+  facet_wrap(~variable, scales="free")
+
+
 
 set.seed(20)
 whitenoise <- ts(rnorm(273, mean=0.18))           
@@ -42,6 +54,13 @@ srer.gpp<-ts(s[s$siteID=="SRER","GPP"], start=c(2001,1), end = c(2020,12), frequ
 konz.gpp<-ts(s[s$siteID=="KONZ","GPP"], start=c(2001,1), end = c(2020,12), frequency=12)
 osbs.gpp<-ts(s[s$siteID=="OSBS","GPP"], start=c(2001,1), end = c(2020,12), frequency=12)
 
+
+# look at evapotransporation
+etr.osbs<-na.omit(s[s$siteID=="OSBS",])
+osbs.etr<-ts(etr.osbs[ ,"etr"], start=c(2016,1), end=c(2020,12),frequency=12)
+
+
+
 par(mfrow=c(2,2))
 plot(bart.gpp, xlab="Year",ylab="GPP", main="Bartlett EF")
 plot(srer.gpp, xlab="Year",ylab="GPP", main="Santa rita EF")
@@ -66,9 +85,12 @@ pacf(osbs.gpp)
 
 
 library(forecast)
-install.packages("forecast")
-tsdisplay(NDVI.ts)
+#install.packages("forecast")
+par(mfrow=c(2,2))
+tsdisplay(osbs.gpp)
+tsdisplay(srer.gpp)
 
+tsdisplay(osbs.etr)
 
 ## soil moisture
 summary(s[is.na(s$soil.moisture),])
@@ -84,6 +106,14 @@ plot(bart.smap, xlab="Year",ylab="smap", main="Bartlett EF")
 plot(srer.smap, xlab="Year",ylab="smap", main="Santa rita EF")
 plot(osbs.smap, xlab="Year",ylab="smap", main="Ordway swisher bio station")
 plot(konz.smap, xlab="Year",ylab="smap", main="Konza prairie")
+
+
+
+
+
+
+
+
 
 
 

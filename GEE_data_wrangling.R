@@ -54,8 +54,10 @@ table(s$etr)
 
 write.csv(s, file="GEE_data.csv")
 
-
-ggplot(iswg[iswg$variable=="smap", ], aes(x=Date, y=value, col=siteID))+geom_point()
+head(iswg)
+table(iswg$variable)
+ggplot(iswg[iswg$variable=="soil.moisture", ], aes(x=Date, y=value, col=siteID))+geom_point()+
+  geom_line()
 
 ggplot(iswg[iswg$variable=="GPP", ], aes(x=Date, y=value, col=siteID))+geom_point()
 
