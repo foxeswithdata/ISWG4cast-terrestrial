@@ -21,7 +21,7 @@ daily$day<-day(daily$time)
 daily$year<-year(daily$time)
 
 dec<-daily[daily$month=="12",]
-jan<-daily[daily$month=="1",]
+Mar<-daily[daily$month=="1",]
 feb<-daily[daily$month=="2",]
 mar<-daily[daily$month=="3",]
 apr<-daily[daily$month=="4",]
@@ -50,8 +50,8 @@ ha$day<-day(ha$time)
 ha$year<-year(ha$time)
 head(ha,200)
 
-Jan<-ha[ha$month==1,]
-Jan<-ha[ha$month==2,]
+#Mar<-ha[ha$month==1,]
+#Mar<-ha[ha$month==2,]
 Mar<-ha[ha$month==3,]
 
 
@@ -68,19 +68,19 @@ b<-ggplot(Mar, aes(x=day, y=value, shape=as.factor(month), col=as.factor(year)))
 b
 
 ## calculate average day from the half hours
-da<-aggregate(list(value=Jan$value), by=list(siteID=Jan$siteID, target=Jan$target,day=Jan$day),FUN="mean", na.rm=T)
+da<-aggregate(list(value=Mar$value), by=list(siteID=Mar$siteID, target=Mar$target,day=Mar$day),FUN="mean", na.rm=T)
 head(da)
 
 # do standard deviation! for each day
 st.err <- function(x) {  sd(x, na.rm=T)  }
-SE <- aggregate( list(se=Jan$value), by=list(siteID=Jan$siteID, target=Jan$target,day=Jan$day),FUN=  st.err)
+SE <- aggregate( list(se=Mar$value), by=list(siteID=Mar$siteID, target=Mar$target,day=Mar$day),FUN=  st.err)
 head(SE)
 da$se<-SE$se
 
 
 c<-ggplot(da, aes(x=day, y=value))+  geom_point()+
   geom_errorbar(aes(ymin=value-se, ymax=value+se), width=.2)+
-  facet_grid(target~siteID, scales="free_y")+ggtitle("Avg+SD of half hour historical January data")
+  facet_grid(target~siteID, scales="free_y")+ggtitle("Avg+SD of half hour historical Maruary data")
 c
 
 
@@ -111,10 +111,15 @@ ja$se<-month$se[match(ja$site.target, mse$site.target)]
 y21<-ja[ja$year=="2020",]
 
 y21
+head(y21)
+table(y21$time)
+
 d<-ggplot(y21, aes(x=day, y=m.avg))+  geom_point()+
   geom_errorbar(aes(ymin=m.avg-se, ymax=m.avg+se), width=.2)+
   facet_grid(target~siteID, scales="free_y")+ggtitle("Monthly average from half hours")
 d
+
+
 
 
 # see the 4 options and workflow
@@ -154,14 +159,16 @@ dim(fin)
 names(fin)
 final<-fin[,c(2,6,7,8,1,4,3,5)]
 
+table(final$time)
+
 # too many rows!
-fin<-final[1:144,]
+fin<-final[117:256,]
 table(fin$time)
 
 
 final[final$statistic=="sd",]
 
-fins<-final[241:384,]
+fins<-final[477:616,]
 table(fins$time)
 
 fi<-rbind(fin, fins)
@@ -178,6 +185,7 @@ head(fi)
 fi$time<-ymd(fi$date)
 
 names(fi)
+str(fi)
 fi<-fi[,1:8]
 
 head(fi)
@@ -185,8 +193,6 @@ table(fi$time)
 tail(fi)
 table(fi$statistic)
 
-write.csv(fi, file="terrestrial-2021-02-01-ISWG.csv")
+write.csv(fi, file="terrestrial-2021-03-01-ISWG.csv")
 
 
-git config --global user.email "bearsofthemoss@gmail.com "
-git config --global user.name "Alex Y"
