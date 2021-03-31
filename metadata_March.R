@@ -12,7 +12,7 @@ emld::eml_version("eml-2.2.0")
 set.seed(42)
 
 # 1. load forecast dataset ####
-dfs = read.csv("terrestrial-2021-01-01-ISWG.csv")
+dfs = read.csv("terrestrial-2021-03-01-ISWG.csv")
 
 # 2. generate metadata ####
 # define the included variables and attributes of the forecast
