@@ -36,12 +36,12 @@ attrList <- set_attributes(attributes,
                                            "numeric","numeric", "numeric","numeric"))
 
 # set metadata about the file itself (name, file type, size, MD5, etc)
-physical <- set_physical("terrestrial-2021-01-01-ISWG.csv",
+physical <- set_physical("terrestrial-2021-03-01-ISWG.csv",
                          recordDelimiter='\n')
 # set metadata for the file as a whole
 dataTable <- eml$dataTable(
   entityName = "forecast",  ## this is a standard name
-  entityDescription = "Forecast of NEE and LE for four NEON sites",
+  entityDescription = "Forecast of NEE, LE, and VSWC for four NEON sites",
   physical = physical,
   attributeList = attrList)
 
@@ -93,7 +93,7 @@ dataset = eml$dataset(
   title = "Summarized historical data as a forecast",
   creator = me,
   contact = "",
-  pubDate = "2021-02-02",
+  pubDate = "2021-03-31",
   intellectualRights = "http://www.lternet.edu/data/netpolicy.html.",
   abstract =  "", ## insert abstract here if applicable
   dataTable = dataTable,
@@ -107,7 +107,7 @@ additionalMetadata <- eml$additionalMetadata(
       ## Basic elements
       timestep = "1 day", ## should be udunits parsable; already in coverage -> temporalCoverage?
       forecast_horizon = "35 days",
-      forecast_issue_time = "2021-02-02",
+      forecast_issue_time = "2021-03-31",
       forecast_iteration_id = "80808080",
       forecast_project_id = "ISWG",
       metadata_standard_version = "0.3",
@@ -160,7 +160,7 @@ my_eml <- eml$eml(dataset = dataset,
 ### did not function properly for January submission ###
 
 # write eml to disk
-write_eml(my_eml, "terrestrial_daily-forecast-2021-01-01-ISWG.xml")
+write_eml(my_eml, "terrestrial_daily-forecast-2021-03-01-ISWG.xml")
 
 # 4. submit metadata ####
-aws.s3::put_object("terrestrial_daily-forecast-2021-01-01-ISWG.xml", bucket = "submissions")
+aws.s3::put_object("terrestrial_daily-forecast-2021-03-01-ISWG.xml", bucket = "submissions")
