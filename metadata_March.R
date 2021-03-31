@@ -61,7 +61,7 @@ me <- list(
 )
 
 # define the geographic coverage of the forecast, using the provided geo.json file
-fullgeographicCoverage <- jsonlite::read_json("meta/terrestrial_geo.json")
+fullgeographicCoverage <- jsonlite::read_json("terrestrial_geo.json")
 site_id_index <- NULL
 for(i in 1:length(fullgeographicCoverage)){
   if(fullgeographicCoverage[[i]]$id %in% dfs$siteID)
@@ -162,5 +162,9 @@ my_eml <- eml$eml(dataset = dataset,
 # write eml to disk
 write_eml(my_eml, "terrestrial_daily-forecast-2021-03-01-ISWG.xml")
 
-# 4. submit metadata ####
+# 4. submit metadata and csv####
+Sys.setenv("AWS_DEFAULT_REGION" = "data",
+           "AWS_S3_ENDPOINT" = "ecoforecast.org",
+           "AWS_SECRET_ACCESS_KEY" = "")
+aws.s3::put_object("terrestrial_daily-2021-03-01-ISWG.csv", bucket = "submissions")
 aws.s3::put_object("terrestrial_daily-forecast-2021-03-01-ISWG.xml", bucket = "submissions")
