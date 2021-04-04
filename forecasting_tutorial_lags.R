@@ -1,5 +1,5 @@
 
-
+library(tidyr)
 library(lubridate)
 # historical 
 gee<-read.csv("GEE_Data.csv")
@@ -7,12 +7,14 @@ gee$Date<-as_date(gee$Date)
 gee$Year<-year(gee$Date)
 gee$week<-week(gee$Date)
 head(gee)
-library(tidyr)
 
+
+# make a wide spreadsheet long by using 'gather'
 g<-gather(gee, "variable","value",7:17)
 dim(g)
 head(g)
 
+# this gets a weekly average
 gs<-aggregate(g$value,by=list(year=g$Year ,month=g$Month,week=g$week,siteID=g$siteID, variable=g$variable ), FUN=mean, na.rm=T )
 head(gs)
 s<-spread(gs, "variable","x")
@@ -20,28 +22,45 @@ head(s)
 
 
 
+
 library(ggplot2)
-ggplot(gs, aes(x=week, y=x, col=siteID))+geom_point()+
+ggplot(gs[gs$year>2015,], aes(x=week, y=x, col=year))+geom_point()+
   facet_wrap(~variable, scales="free")
 
+## To get a weekly average, average by week
+w<-gs[gs$year>2015,]
 
+head(w)
+table(w$year, w$week)
+
+wat<-ts(w[w$siteID=="BART","GPP"], start=c(2016,1), end = c(2020,12), frequency=6)
+
+
+365/53
+## make a time series of the data with weeks?
+table(gs$week, gs$year)
+
+bart.gpp<-ts(s[s$siteID=="BART","GPP"], start=c(2001,1), end = c(2020,12), frequency=12)
+
+## If you want to follow the tutorial online, this is the github directory
+setwd("~/GitHub/forecasting-course/content/en/data")
+
+
+data = read.csv('portal_timeseries.csv')
+head(data)
 
 set.seed(20)
 whitenoise <- ts(rnorm(273, mean=0.18))           
 plot(whitenoise, main="White noise")
 abline(h=0.18)
 
-
-setwd("~/GitHub/forecasting-course/content/en/data")
-
-data = read.csv('portal_timeseries.csv')
-head(data)
 NDVI.ts = ts(data$NDVI, start = c(1992, 3), end = c(2014, 11), frequency = 12)
 NDVI.ts
 plot(NDVI.ts, xlab = "Year", ylab="greenness", main="NDVI")
 abline(h=0.18)
 
-####################
+
+## Otherwise, I use the gee dataset below to go through the tutorial
 summary(gee)
 plot(gee$Date, gee$soil.moisture)
 summary(s)
