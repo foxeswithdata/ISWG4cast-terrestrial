@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 FLUXNET data/**/*.csv
+FLUXNET data/**/*.xlsx
