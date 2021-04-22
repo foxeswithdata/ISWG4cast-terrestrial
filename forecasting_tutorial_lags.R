@@ -28,15 +28,8 @@ ggplot(gs[gs$year>2015,], aes(x=week, y=x, col=year))+geom_point()+
   facet_wrap(~variable, scales="free")
 
 ## To get a weekly average, average by week
-w<-gs[gs$year>2015,]
+w<-s[s$year>2015,]
 
-head(w)
-table(w$year, w$week)
-
-wat<-ts(w[w$siteID=="BART","GPP"], start=c(2016,1), end = c(2020,12), frequency=6)
-
-
-365/53
 ## make a time series of the data with weeks?
 table(gs$week, gs$year)
 
