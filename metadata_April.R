@@ -1,5 +1,6 @@
 # Script for generating metadata for the Ecological Forecasting Initiative- Terrestrial forecasting challenge; Team ISWG
-
+foredate = "2021-04-01"
+today = Sys.Date()
 library(EML)
 library(ncdf4)
 library(emld)
@@ -8,11 +9,12 @@ library(tibble)
 library(dplyr)
 library(tidyr)
 library(reshape2)
+library(aws.s3)
 emld::eml_version("eml-2.2.0")
 set.seed(42)
 
 # 1. load forecast dataset ####
-dfs = read.csv("terrestrial-2021-04-01-ISWG.csv")
+dfs = read.csv(paste0("terrestrial_daily-", foredate, "-ISWG.csv"))
 
 # 2. generate metadata ####
 # define the included variables and attributes of the forecast
@@ -36,7 +38,7 @@ attrList <- set_attributes(attributes,
                                            "numeric","numeric", "numeric","numeric"))
 
 # set metadata about the file itself (name, file type, size, MD5, etc)
-physical <- set_physical("terrestrial-2021-04-01-ISWG.csv",
+physical <- set_physical(paste0("terrestrial-", foredate, "-ISWG.csv"),
                          recordDelimiter='\n')
 # set metadata for the file as a whole
 dataTable <- eml$dataTable(
@@ -93,7 +95,7 @@ dataset = eml$dataset(
   title = "Summarized historical data as a forecast",
   creator = me,
   contact = "",
-  pubDate = "2021-05-06",
+  pubDate = today,
   intellectualRights = "http://www.lternet.edu/data/netpolicy.html.",
   abstract =  "", ## insert abstract here if applicable
   dataTable = dataTable,
@@ -107,7 +109,7 @@ additionalMetadata <- eml$additionalMetadata(
       ## Basic elements
       timestep = "1 day", ## should be udunits parsable; already in coverage -> temporalCoverage?
       forecast_horizon = "35 days",
-      forecast_issue_time = "2021-05-06",
+      forecast_issue_time = today,
       forecast_iteration_id = "80808080",
       forecast_project_id = "ISWG",
       metadata_standard_version = "0.3",
@@ -160,11 +162,11 @@ my_eml <- eml$eml(dataset = dataset,
 ### did not function properly for January submission ###
 
 # write eml to disk
-write_eml(my_eml, "terrestrial_daily-forecast-2021-04-01-ISWG.xml")
+write_eml(my_eml, paste0("terrestrial_daily-forecast-", foredate, "-ISWG.xml"))
 
 # 4. submit metadata and csv####
 Sys.setenv("AWS_DEFAULT_REGION" = "data",
            "AWS_S3_ENDPOINT" = "ecoforecast.org",
            "AWS_SECRET_ACCESS_KEY" = "")
-aws.s3::put_object("terrestrial_daily-2021-04-01-ISWG.csv", bucket = "submissions")
-aws.s3::put_object("terrestrial_daily-forecast-2021-04-01-ISWG.xml", bucket = "submissions")
+aws.s3::put_object(paste0("terrestrial_daily-", foredate, "-ISWG.csv"), bucket = "submissions")
+aws.s3::put_object(paste0("terrestrial_daily-forecast-", foredate, "-ISWG.xml"), bucket = "submissions")
