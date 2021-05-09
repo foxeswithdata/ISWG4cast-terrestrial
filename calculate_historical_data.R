@@ -31,7 +31,7 @@ ggplot(daily, aes(x=month, y=le ))+geom_jitter()+facet_wrap(~siteID)+ggtitle("LE
 ggplot(daily, aes(x=month, y=vswc ))+geom_jitter()+facet_wrap(~siteID)+ggtitle("soil moisture")
 
 
-wind<-rbind(mar, feb, apr)
+wind<-rbind(apr)
 ja<-gather(wind,"target","value",3:5)
 
 a<-ggplot(ja, aes(x=day, y=value, shape=as.factor(month), col=as.factor(year)))+geom_point()+
@@ -52,8 +52,10 @@ head(ha,200)
 
 #Mar<-ha[ha$month==1,]
 #Mar<-ha[ha$month==2,]
-Mar<-ha[ha$month==3,]
+Mar<-ha[ha$month==4,]
+May<-ha[ha$month==5,]
 
+Mar<-rbind(Mar,May)
 
 
 ggplot(ha, aes(x=month, y=value, col=siteID ))+geom_jitter()+facet_grid(target~siteID, scales="free")
@@ -129,6 +131,8 @@ ggarrange(a,b,c,d, common.legend = T, nrow=1)
 
 ######### Alright, now format the data
 names(ja)
+
+
 us<-y21
 use<-us[,c(1,2,5,6,7,10)]
 use.se<-us[,c(1,2,5,6,7,11)]
@@ -144,7 +148,7 @@ names(use.se)
 
 stat.se<-spread(use.se[,c(1,2,5,6)], "target","se")
 stat.se$statistic<-"sd"
-stat.se[stat.se$siteID=="BART","vswc"]<-"0.05"
+stat.se[stat.se$siteID=="BART","vswc"]<-"0.1"
 head(stat.se)
 
 fin<-rbind(stat.mean, stat.se)
@@ -157,16 +161,23 @@ head(fin)
 #final<-fin[,c("siteID","statistic","forecast","data_assimilation","time","nee","le","vcwc")]
 dim(fin)
 names(fin)
-final<-fin[,c(2,6,7,8,1,4,3,5)]
+fin$obs_flag<-"1"
+final<-fin[,c(8,1,5,9,2,3,4,7,6)]
+
+names(final)              
 
 table(final$time)
 
 # too many rows!
-fin<-final[117:256,]
+fin<-final[1:240,]
 table(fin$time)
-
+dim(final)
 
 final[final$statistic=="sd",]
+
+
+
+
 
 fins<-final[477:616,]
 table(fins$time)
@@ -193,6 +204,6 @@ table(fi$time)
 tail(fi)
 table(fi$statistic)
 
-write.csv(fi, file="terrestrial-2021-03-01-ISWG.csv")
+write.csv(fi, file="terrestrial_daily-2021-04-01-ISWG.csv")
 
 
