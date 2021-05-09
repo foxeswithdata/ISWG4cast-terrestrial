@@ -2,4 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
-FLUXNET data/**/*.xlsx
+FLUXNET data/
+efi_neon_challenge/

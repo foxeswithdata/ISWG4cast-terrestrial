@@ -78,8 +78,6 @@ df = noaa_gefs_read(base_dir, date, cycle, sites) %>%
   dplyr::filter(ensemble != "0")
 
 # generate statistics
-
-
 df_stats = aggregate(data = df, air_temperature ~ siteID + time + preddate, FUN = function(x) c(avg = mean(x-273.15),upper = mean(x-273.15) + sd(x-273.15)/sqrt(length(x-273.15)), lower = mean(x-273.15) - sd(x-273.15)/sqrt(length(x-273.15))), simplify = TRUE, drop = TRUE)
 
 # reformat for convenience
