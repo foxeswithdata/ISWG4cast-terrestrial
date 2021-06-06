@@ -9,7 +9,10 @@ zipsByProduct(dpID="DP1.00002.001", site="BART",
               package="basic", check.size=T)
 
 
-neon_download(product = "DP1.00094.001",site=c("BART","OSBS","SRER","KONZ")) 
+neon_download(product = "DP1.00094.001",site=c("BART","OSBS","SRER","KONZ"))
+
+neon_index()
+
 table(as.data.frame(neon_index())$table)
 neon_store(product="DP1.00006.001", table="THRPRE_30min-expanded")
 preci_data<-neon_table("THRPRE_30min-expanded")
